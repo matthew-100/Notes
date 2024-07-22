@@ -1,25 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { Note as NoteModel } from "./models/note";
+import Note from "./components/Note";
+import { Grid } from "@mui/material";
 
 function App() {
+  const [notes, setNotes] = useState<NoteModel[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/notes", { method: "GET" });
+        const notes = await response.json();
+        setNotes(notes);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Grid container direction={"row"} style={{ padding: 20 }} gap={2}>
+      {notes.map((note) => (
+        <Grid item key={note._id}>
+          <Note note={note} />
+        </Grid>
+      ))}
+    </Grid>
   );
 }
 
