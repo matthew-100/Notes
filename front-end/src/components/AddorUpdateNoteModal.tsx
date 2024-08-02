@@ -38,8 +38,8 @@ const AddorUpdateNoteDialog = ({
   const handleClose = () => {
     setOpen(false);
     setNoteData({
-      title: "",
-      text: "",
+      title: noteToEdit?.title || "",
+      text: noteToEdit?.text || "",
     });
   };
 

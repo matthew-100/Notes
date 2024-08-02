@@ -6,11 +6,14 @@ import * as NotesApi from "./network/notes_api";
 import AddorUpdateNoteDialog from "./components/AddorUpdateNoteModal";
 
 import AddIcon from "@mui/icons-material/Add";
+import AuthModal from "./components/AuthModal";
 
 function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
   const [addNoteOpen, setAddNoteOpen] = useState(false);
   const [noteToEdit, setNotetoEdit] = useState<NoteModel | null>(null);
+  const [openAuthModal, setOpenAuthModal] = useState(false);
+  const [signUpBool, setSignUpBool] = useState(false);
   const getNewNote = (newNote: NoteModel) => {
     if (noteToEdit) {
       setNotes(
@@ -44,6 +47,16 @@ function App() {
     loadNotes();
   }, []);
 
+  const handleLoginClick = () => {
+    setOpenAuthModal(true);
+    setSignUpBool(false);
+  };
+
+  const handleSignUpClick = () => {
+    setOpenAuthModal(true);
+    setSignUpBool(true);
+  };
+
   return (
     <Grid
       container
@@ -56,6 +69,14 @@ function App() {
       <Button variant="contained" onClick={() => setAddNoteOpen(true)}>
         <AddIcon />
         Add Note
+      </Button>
+      <Button variant="contained" onClick={handleLoginClick}>
+        <AddIcon />
+        Login
+      </Button>
+      <Button variant="contained" onClick={handleSignUpClick}>
+        <AddIcon />
+        Sign Up
       </Button>
       <Grid container direction={"row"} gap={2}>
         {notes.map((note) => (
@@ -70,6 +91,11 @@ function App() {
           setOpen={setAddNoteOpen}
           getNewNote={getNewNote}
         />
+        <AuthModal
+          open={openAuthModal}
+          setOpen={setOpenAuthModal}
+          signUpBool={signUpBool}
+        ></AuthModal>
       </Grid>
     </Grid>
   );

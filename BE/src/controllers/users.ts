@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 export interface SignUpBody {
   username: string;
   email: string;
-  passwordRaw: string;
+  password: string;
 }
 
 export interface LoginBody {
@@ -35,15 +35,15 @@ export const signUp: RequestHandler<
   SignUpBody,
   unknown
 > = async (req, res, next) => {
-  const { username, email, passwordRaw } = req.body;
+  const { username, email, password } = req.body;
   try {
-    if (!username || !email || !passwordRaw)
+    if (!username || !email || !password)
       throw createHttpError(400, "Parameters missing");
     const existingUsername = await UserModel.findOne({ username }).exec();
     if (existingUsername) throw createHttpError(409, "Username already exists");
     const existingEmail = await UserModel.findOne({ email }).exec();
     if (existingEmail) throw createHttpError(409, "Email already exists");
-    const passwordHashed = await bcrypt.hash(passwordRaw, 10);
+    const passwordHashed = await bcrypt.hash(password, 10);
     const newUser = await UserModel.create({
       username,
       email,
