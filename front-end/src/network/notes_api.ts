@@ -89,7 +89,14 @@ export const login = async (user: User) => {
 };
 
 export const logout = async () => {
-  await fetchData("api/users/logout", {
+  await fetchData("/api/users/logout", {
     method: "POST",
   });
+};
+
+export const authenticate = async () => {
+  const response = await fetchData("/api/users/", {
+    method: "GET",
+  });
+  return response.json();
 };

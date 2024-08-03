@@ -7,6 +7,8 @@ import AddorUpdateNoteDialog from "./components/AddorUpdateNoteModal";
 
 import AddIcon from "@mui/icons-material/Add";
 import AuthModal from "./components/AuthModal";
+import NavBar from "./components/NavBar";
+import { User } from "./models/user";
 
 function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
@@ -14,6 +16,9 @@ function App() {
   const [noteToEdit, setNotetoEdit] = useState<NoteModel | null>(null);
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [signUpBool, setSignUpBool] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userDetails, setUserDetails] = useState<User | null>(null);
+
   const getNewNote = (newNote: NoteModel) => {
     if (noteToEdit) {
       setNotes(
@@ -36,6 +41,22 @@ function App() {
   };
 
   useEffect(() => {
+    const checkForSession = async () => {
+      try {
+        const response = await fetch("/api/users/", {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error("User not authenticated");
+        }
+        const user = await response.json();
+        setUserDetails(user);
+        setIsLoggedIn(true);
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkForSession();
     const loadNotes = async () => {
       try {
         const notes = await NotesApi.fetchNotes();
@@ -47,16 +68,6 @@ function App() {
     loadNotes();
   }, []);
 
-  const handleLoginClick = () => {
-    setOpenAuthModal(true);
-    setSignUpBool(false);
-  };
-
-  const handleSignUpClick = () => {
-    setOpenAuthModal(true);
-    setSignUpBool(true);
-  };
-
   return (
     <Grid
       container
@@ -66,37 +77,44 @@ function App() {
       style={{ padding: 20 }}
       gap={2}
     >
-      <Button variant="contained" onClick={() => setAddNoteOpen(true)}>
-        <AddIcon />
-        Add Note
-      </Button>
-      <Button variant="contained" onClick={handleLoginClick}>
-        <AddIcon />
-        Login
-      </Button>
-      <Button variant="contained" onClick={handleSignUpClick}>
-        <AddIcon />
-        Sign Up
-      </Button>
-      <Grid container direction={"row"} gap={2}>
-        {notes.map((note) => (
-          <Grid item key={note._id} onClick={() => handleNoteClick(note)}>
-            <Note note={note} getDeletedNote={getDeletedNote} />
-          </Grid>
-        ))}
+      <NavBar
+        setOpenAuthModal={setOpenAuthModal}
+        setSignUpBool={setSignUpBool}
+        isLoggedIn={isLoggedIn}
+        userDetails={userDetails}
+        setIsLoggedIn={setIsLoggedIn}
+      ></NavBar>
+      <AuthModal
+        open={openAuthModal}
+        setOpen={setOpenAuthModal}
+        signUpBool={signUpBool}
+        setIsLoggedIn={setIsLoggedIn}
+        setUserDetails={setUserDetails}
+      ></AuthModal>
 
-        <AddorUpdateNoteDialog
-          noteToEdit={noteToEdit}
-          open={addNoteOpen}
-          setOpen={setAddNoteOpen}
-          getNewNote={getNewNote}
-        />
-        <AuthModal
-          open={openAuthModal}
-          setOpen={setOpenAuthModal}
-          signUpBool={signUpBool}
-        ></AuthModal>
-      </Grid>
+      {isLoggedIn && (
+        <>
+          <Button variant="contained" onClick={() => setAddNoteOpen(true)}>
+            <AddIcon />
+            Add Note
+          </Button>
+
+          <Grid container direction={"row"} gap={2}>
+            {notes.map((note) => (
+              <Grid item key={note._id} onClick={() => handleNoteClick(note)}>
+                <Note note={note} getDeletedNote={getDeletedNote} />
+              </Grid>
+            ))}
+
+            <AddorUpdateNoteDialog
+              noteToEdit={noteToEdit}
+              open={addNoteOpen}
+              setOpen={setAddNoteOpen}
+              getNewNote={getNewNote}
+            />
+          </Grid>
+        </>
+      )}
     </Grid>
   );
 }

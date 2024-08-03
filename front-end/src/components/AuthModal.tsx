@@ -13,9 +13,17 @@ interface AuthModalProps {
   open: boolean;
   setOpen: Function;
   signUpBool: boolean;
+  setIsLoggedIn: Function;
+  setUserDetails: Function;
 }
 
-const AuthModal = ({ open, setOpen, signUpBool }: AuthModalProps) => {
+const AuthModal = ({
+  open,
+  setOpen,
+  signUpBool,
+  setIsLoggedIn,
+  setUserDetails,
+}: AuthModalProps) => {
   const nullUser = {
     username: "",
     email: "",
@@ -40,11 +48,24 @@ const AuthModal = ({ open, setOpen, signUpBool }: AuthModalProps) => {
   const handleSubmit = async (signUpBool: boolean) => {
     let authResponse;
     if (signUpBool) {
-      authResponse = await signUp(userData);
+      try {
+        authResponse = await signUp(userData);
+        setIsLoggedIn(true);
+        setUserDetails(authResponse);
+      } catch (error) {
+        console.error(error);
+      }
     } else {
-      authResponse = await login(userData);
+      try {
+        authResponse = await login(userData);
+        setIsLoggedIn(true);
+        setUserDetails(authResponse);
+      } catch (error) {
+        console.error(error);
+      }
     }
     setOpen(false);
+    setUserData(nullUser);
   };
   return (
     <Dialog open={open}>
