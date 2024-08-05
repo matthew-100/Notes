@@ -18,9 +18,10 @@ interface NoteProps {
 const useStyles = makeStyles({
   noteCard: {
     backgroundColor: "cornsilk",
-    minWidth: "500px",
+    minWidth: "300px",
     maxWidth: "500px",
-    maxHeight: "70px",
+    minHeight: "300px",
+    maxHeight: "500px",
     overflow: "auto",
   },
 });
