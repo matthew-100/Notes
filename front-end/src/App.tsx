@@ -66,7 +66,7 @@ function App() {
       }
     };
     loadNotes();
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <Grid
@@ -92,6 +92,8 @@ function App() {
         setUserDetails={setUserDetails}
       ></AuthModal>
 
+      {!isLoggedIn && <>Please login to add or view notes</>}
+
       {isLoggedIn && (
         <>
           <Button variant="contained" onClick={() => setAddNoteOpen(true)}>
@@ -100,11 +102,17 @@ function App() {
           </Button>
 
           <Grid container direction={"row"} gap={2}>
-            {notes.map((note) => (
-              <Grid item key={note._id} onClick={() => handleNoteClick(note)}>
-                <Note note={note} getDeletedNote={getDeletedNote} />
-              </Grid>
-            ))}
+            {notes.length !== 0
+              ? notes.map((note) => (
+                  <Grid
+                    item
+                    key={note._id}
+                    onClick={() => handleNoteClick(note)}
+                  >
+                    <Note note={note} getDeletedNote={getDeletedNote} />
+                  </Grid>
+                ))
+              : null}
 
             <AddorUpdateNoteDialog
               noteToEdit={noteToEdit}
